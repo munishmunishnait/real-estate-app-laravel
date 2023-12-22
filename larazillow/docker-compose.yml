@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mariadb:10.8.3
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootroot
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile   # Path to your Laravel Dockerfile
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: larazillow
+      DB_USERNAME: root
+      DB_PASSWORD: rootroot
+    volumes:
+      - ./laravel:/var/www/html   # Mount your Laravel code into the container
+    ports:
+      - 8000:8000  # Adjust this port based on your Laravel application
